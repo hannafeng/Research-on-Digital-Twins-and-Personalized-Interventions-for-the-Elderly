@@ -1,0 +1,19 @@
+# 使用官方Spark镜像作为基础
+FROM bitnami/spark:3.5.0
+
+# 设置工作目录
+WORKDIR /app
+
+# 安装Python依赖
+COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+# 复制Spark处理代码
+COPY src/processing/streaming/ /app/src/processing/streaming/
+
+# 暴露Spark UI端口
+EXPOSE 8080
+EXPOSE 4040
+
+# 启动Spark Streaming处理
+CMD ["spark-submit", "--master", "local[*]", "/app/src/processing/streaming/spark_processor.py"]

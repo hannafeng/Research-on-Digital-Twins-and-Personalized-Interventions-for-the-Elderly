@@ -1,0 +1,227 @@
+version: '3.8'
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  influxdb-data:
+  redis-data:
+  kafka-data:
+  zookeeper-data:
+  models:
+
+services:
+  # 前端服务
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+    depends_on:
+      - backend
+    restart: always
+
+  # 数据采集服务（后端）
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.collector
+    ports:
+      - "8000:8000"
+    networks:
+      - app-network
+    depends_on:
+      - kafka
+      - redis
+      - postgres
+      - influxdb
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=elderly_care
+      - INFLUXDB_HOST=influxdb
+      - INFLUXDB_PORT=8086
+      - INFLUXDB_TOKEN=my-super-secret-token
+      - INFLUXDB_ORG=elderly-care
+      - INFLUXDB_BUCKET=sensor-data
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    restart: always
+
+  # 数据处理服务（Spark）
+  spark-processor:
+    build:
+      context: .
+      dockerfile: Dockerfile.spark
+    networks:
+      - app-network
+    depends_on:
+      - kafka
+      - redis
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    restart: always
+
+  # 消息队列（Kafka）
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    ports:
+      - "2181:2181"
+    networks:
+      - app-network
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=2181
+      - ZOOKEEPER_TICK_TIME=2000
+    restart: always
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    networks:
+      - app-network
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:9093
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+    depends_on:
+      - zookeeper
+    restart: always
+
+  # 存储服务
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+    volumes:
+      - redis-data:/data
+    restart: always
+
+  postgres:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=elderly_care
+    restart: always
+
+  influxdb:
+    image: influxdb:2-alpine
+    ports:
+      - "8086:8086"
+    networks:
+      - app-network
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=password
+      - DOCKER_INFLUXDB_INIT_ORG=elderly-care
+      - DOCKER_INFLUXDB_INIT_BUCKET=sensor-data
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-token
+    restart: always
+
+  # 模型服务
+  activity-model:
+    build: .
+    ports:
+      - "8501:8501"
+    networks:
+      - app-network
+    volumes:
+      - models:/app/models
+    environment:
+      - MODEL_NAME=activity_model
+    restart: always
+
+  emotion-model:
+    build: .
+    ports:
+      - "8502:8501"
+    networks:
+      - app-network
+    volumes:
+      - models:/app/models
+    environment:
+      - MODEL_NAME=emotion_model
+    restart: always
+
+  intervention-model:
+    build: .
+    ports:
+      - "8503:8501"
+    networks:
+      - app-network
+    volumes:
+      - models:/app/models
+    environment:
+      - MODEL_NAME=intervention_model
+    restart: always
+
+  # 模型服务（Flask）
+  model-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.model
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+    volumes:
+      - models:/app/models
+    environment:
+      - QWEN_API_KEY=${QWEN_API_KEY}
+      - QWEN_API_URL=${QWEN_API_URL:-https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation}
+      - QWEN_MODEL=${QWEN_MODEL:-qwen-plus}
+    restart: always
+    depends_on:
+      - redis
+      - kafka
+
+  # 监控服务
+  prometheus:
+    image: prom/prometheus:v2.48
+    ports:
+      - "9090:9090"
+    networks:
+      - app-network
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    restart: always
+
+  grafana:
+    image: grafana/grafana:10.2
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+    restart: always
+    depends_on:
+      - prometheus

@@ -1,0 +1,78 @@
+.family-dashboard {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  background-color: #f0f2f5;
+}
+
+.main-card {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.dashboard-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.emergency-button {
+  font-size: 16px;
+  padding: 8px 24px;
+}
+
+.summary-card {
+  margin-bottom: 20px;
+}
+
+.trend-card {
+  margin-bottom: 20px;
+}
+
+.trend-chart {
+  width: 100%;
+  height: 400px;
+}
+
+.quick-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .family-dashboard {
+    padding: 10px;
+  }
+  
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .emergency-button {
+    margin-top: 16px;
+    width: 100%;
+  }
+  
+  .trend-chart {
+    height: 300px;
+  }
+  
+  .quick-actions {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .quick-actions button {
+    width: 100%;
+  }
+}

@@ -1,0 +1,22 @@
+.admin-dashboard {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  background-color: #f0f2f5;
+}
+
+.main-card {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .admin-dashboard {
+    padding: 10px;
+  }
+  
+  .main-card {
+    width: 100%;
+  }
+}

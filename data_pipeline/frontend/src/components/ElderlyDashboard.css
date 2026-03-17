@@ -1,0 +1,208 @@
+.elderly-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+  border-radius: 8px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* 大字体设计 */
+.elderly-dashboard h1 {
+  font-size: 2.5rem;
+  text-align: center;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.elderly-dashboard h2 {
+  font-size: 1.8rem;
+  text-align: center;
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+/* 日常指令部分 */
+.commands-section {
+  margin-bottom: 2rem;
+}
+
+.commands-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.command-card {
+  padding: 2rem;
+  border-radius: 12px;
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.command-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.command-time {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #646cff;
+}
+
+.command-content {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #333;
+  text-align: center;
+}
+
+.play-button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  background-color: #646cff;
+  color: white;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.play-button:hover {
+  background-color: #535bf2;
+}
+
+/* 一键呼叫部分 */
+.call-section {
+  margin-bottom: 2rem;
+}
+
+.call-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.emergency-button {
+  padding: 2rem 4rem;
+  border-radius: 16px;
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  font-size: 1.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 300px;
+  text-align: center;
+}
+
+.emergency-button:hover {
+  background-color: #ff7875;
+  transform: scale(1.05);
+}
+
+.emergency-button:disabled {
+  background-color: #ffb3b3;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.daily-button {
+  padding: 1.5rem 3rem;
+  border-radius: 12px;
+  background-color: #52c41a;
+  color: white;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 250px;
+  text-align: center;
+}
+
+.daily-button:hover {
+  background-color: #73d13d;
+  transform: scale(1.05);
+}
+
+.daily-button:disabled {
+  background-color: #b7eb8f;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 语音助手部分 */
+.voice-section {
+  margin-bottom: 2rem;
+}
+
+.voice-control {
+  display: flex;
+  justify-content: center;
+}
+
+.voice-button {
+  padding: 1.5rem 3rem;
+  border-radius: 12px;
+  background-color: #1890ff;
+  color: white;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 250px;
+  text-align: center;
+}
+
+.voice-button:hover {
+  background-color: #40a9ff;
+  transform: scale(1.05);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .elderly-dashboard {
+    padding: 1rem;
+  }
+  
+  .elderly-dashboard h1 {
+    font-size: 2rem;
+  }
+  
+  .elderly-dashboard h2 {
+    font-size: 1.5rem;
+  }
+  
+  .command-card {
+    padding: 1.5rem;
+  }
+  
+  .command-content {
+    font-size: 1.2rem;
+  }
+  
+  .emergency-button {
+    padding: 1.5rem 3rem;
+    font-size: 1.5rem;
+    min-width: 250px;
+  }
+  
+  .daily-button,
+  .voice-button {
+    padding: 1.25rem 2.5rem;
+    font-size: 1.2rem;
+    min-width: 200px;
+  }
+}

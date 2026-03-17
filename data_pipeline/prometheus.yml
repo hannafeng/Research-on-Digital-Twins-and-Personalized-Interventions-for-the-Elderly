@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'tensorflow-serving'
+    static_configs:
+      - targets: ['activity-model:8501', 'emotion-model:8501', 'intervention-model:8501']
+
+  - job_name: 'docker'
+    static_configs:
+      - targets: ['localhost:9323']

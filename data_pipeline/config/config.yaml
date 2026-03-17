@@ -1,0 +1,110 @@
+# AI社区养老数字孪生平台 - 数据管道配置文件
+
+# 项目基本信息
+project:
+  name: "AI社区养老数字孪生平台"
+  version: "1.0.0"
+  description: "多源异构数据实时采集、清洗、融合与存储系统"
+
+# 数据源配置
+data_sources:
+  wearable:
+    enabled: true
+    protocols:
+      - ble
+      - mqtt
+    sampling_rate: 5  # Hz
+  environment:
+    enabled: true
+    protocols:
+      - mqtt
+      - http
+    sampling_rate: 0.5  # Hz
+  audio:
+    enabled: true
+    protocol: websocket
+    sampling_rate: 16000  # Hz
+    channels: 1
+    sample_width: 2  # bytes
+
+# 采集层配置
+collection:
+  wearable:
+    ble_scan_interval: 5  # seconds
+    mqtt_topic: "devices/wearable/#"
+  environment:
+    mqtt_topic: "devices/environment/#"
+    http_endpoint: "http://localhost:8000/sensors/data"
+  audio:
+    websocket_url: "ws://localhost:8001/audio/stream"
+    buffer_size: 4096
+
+# 处理层配置
+processing:
+  cleaning:
+    outlier_detection: true
+    outlier_threshold: 3.0  # 标准差倍数
+    missing_value_imputation: true
+    imputation_method: "linear"  # linear, mean, median
+  fusion:
+    time_window: 60  # seconds
+    spatial_alignment: true
+    feature_extraction: true
+
+# 存储层配置
+storage:
+  redis:
+    host: "localhost"
+    port: 6379
+    db: 0
+    password: ""
+    expire_time: 300  # seconds (5 minutes)
+  postgresql:
+    host: "localhost"
+    port: 5432
+    database: "elderly_care"
+    user: "admin"
+    password: "password"
+  influxdb:
+    url: "http://localhost:8086"
+    token: "my-token"
+    org: "elderly-care-org"
+    bucket: "elderly-care-bucket"
+    retention_policy: "30d"
+
+# 消息队列配置
+message_queue:
+  kafka:
+    bootstrap_servers: "localhost:9092"
+    topics:
+      - "raw_data"
+      - "cleaned_data"
+      - "fused_data"
+    group_id: "data_pipeline_group"
+
+# 调度系统配置
+scheduling:
+  enabled: true
+  schedule_interval: 300  # seconds (5 minutes)
+  tasks:
+    - "data_collection"
+    - "data_cleaning"
+    - "data_fusion"
+    - "data_storage"
+    - "digital_twin_update"
+
+# 监控配置
+monitoring:
+  prometheus:
+    enabled: true
+    port: 8000
+  grafana:
+    enabled: true
+    url: "http://localhost:3000"
+    api_key: "my-grafana-api-key"
+
+# 日志配置
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/data_pipeline.log"
